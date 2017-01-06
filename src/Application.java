@@ -142,8 +142,7 @@ class Application {
         while (state.equals(State.RX_OFF_TX_ON)) {
             if (acceptTcpConnection())
                 break;
-            System.out.println(ex.isShutdown());
-            System.out.println(ex.isTerminated());
+
             logger.info("Attempt to receive message from the udp socket...");
             try {
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -185,6 +184,8 @@ class Application {
     }
 
     private boolean acceptTcpConnection() throws Exception {
+        if(tcpInSocket != null)
+            return false;
         try {
             logger.info("Attempt to accept new connection...");
             tcpInSocket = tcpServerSocket.accept();
