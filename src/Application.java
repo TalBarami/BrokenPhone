@@ -12,9 +12,6 @@ import static misc.Message.*;
 import static misc.Utils.SECOND;
 import static misc.Utils.getAvailablePort;
 
-/**
- * Created by Tal on 02/01/2017.
- */
 class Application {
     private Logger logger = Logger.getLogger("Application");
 
@@ -131,11 +128,12 @@ class Application {
                 System.out.println("Please enter your initial input below:");
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
                 String input = br.readLine();
-                logger.info("Received input: " + input);
+                logger.info("Sent input: " + input);
 
                 DataOutputStream out = new DataOutputStream(tcpOutSocket.getOutputStream());
                 out.writeBytes(input + '\n');
                 logger.info("Message sent via the tcp out socket.");
+                ex.shutdown();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -144,7 +142,8 @@ class Application {
         while (state.equals(State.RX_OFF_TX_ON)) {
             if (acceptTcpConnection())
                 break;
-
+            System.out.println(ex.isShutdown());
+            System.out.println(ex.isTerminated());
             logger.info("Attempt to receive message from the udp socket...");
             try {
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -161,7 +160,6 @@ class Application {
             } catch (SocketTimeoutException ignore) {
                 logger.info("No new messages detected via the udp socket.");
             }
-
         }
     }
 
