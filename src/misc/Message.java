@@ -3,9 +3,6 @@ package misc;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
-/**
- * Created by Tal on 05/01/2017.
- */
 public class Message {
     private static String getName() {
         return "Networking17";

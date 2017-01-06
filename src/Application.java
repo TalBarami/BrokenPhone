@@ -61,7 +61,7 @@ class Application {
                         System.exit(1);
                 }
             }
-        } catch(Exception e){
+        } catch (Exception e) {
             logger.severe("Fatal error detected.");
             e.printStackTrace();
         }
@@ -71,6 +71,7 @@ class Application {
         try {
             tcpServerSocket = new ServerSocket(getAvailablePort());
             tcpServerSocket.setSoTimeout(SECOND);
+            logger.info("TCP server socket is up on port " + tcpServerSocket.getLocalPort());
 
             InetAddress broadcastIP = InetAddress.getByName("255.255.255.255");
 
@@ -81,21 +82,22 @@ class Application {
             sendData = createRequestMessage();
             receiveData = new byte[32];
             udpSocket.send(new DatagramPacket(sendData, sendData.length, broadcastIP, udpPort));
+            logger.info("Sending request message via udp broadcast. Message: " + getId(sendData) + ", Port: " + udpPort);
 
             while (state.equals(State.RX_OFF_TX_OFF)) {
-                if(acceptTcpConnection())
+                if (acceptTcpConnection())
                     break;
 
                 try {
                     logger.info("Attempt to receive message from the udp socket...");
                     DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                     udpSocket.receive(receivePacket);
-                    if(receivePacket.getAddress().equals(InetAddress.getLocalHost()))
+                    if (receivePacket.getAddress().equals(InetAddress.getLocalHost()))
                         continue;
 
                     byte[] response = receivePacket.getData();
                     //String response = new String(receivePacket.getData());
-                    logger.info("Received new message: " + new String(response)+ ". RID: " + getId(response));
+                    logger.info("Received new message: " + new String(response) + ". RID: " + getId(response));
                     switch (getType(response)) {
                         case "REQM":
                             sendData = createOfferMessage(getId(response), InetAddress.getLocalHost(), (short) tcpServerSocket.getLocalPort());
@@ -140,7 +142,7 @@ class Application {
         });
 
         while (state.equals(State.RX_OFF_TX_ON)) {
-            if(acceptTcpConnection())
+            if (acceptTcpConnection())
                 break;
 
             logger.info("Attempt to receive message from the udp socket...");
@@ -163,16 +165,16 @@ class Application {
         }
     }
 
-    private void brokenPhoneTail() throws Exception{
-        while(state.equals(State.RX_ON_TX_OFF)){
+    private void brokenPhoneTail() throws Exception {
+        while (state.equals(State.RX_ON_TX_OFF)) {
             BufferedReader br = new BufferedReader(new InputStreamReader(tcpInSocket.getInputStream()));
             String input = br.readLine();
             System.out.println("Received input: " + input);
         }
     }
 
-    private void brokenPhoneLink() throws Exception{
-        while(state.equals(State.RX_ON_TX_ON)){
+    private void brokenPhoneLink() throws Exception {
+        while (state.equals(State.RX_ON_TX_ON)) {
             BufferedReader br = new BufferedReader(new InputStreamReader(tcpInSocket.getInputStream()));
             String input = br.readLine();
             logger.info("Received input: " + input);
@@ -184,12 +186,12 @@ class Application {
         }
     }
 
-    private boolean acceptTcpConnection() throws Exception{
+    private boolean acceptTcpConnection() throws Exception {
         try {
             logger.info("Attempt to accept new connection...");
             tcpInSocket = tcpServerSocket.accept();
             state = state.equals(State.RX_OFF_TX_OFF) ? State.RX_ON_TX_OFF : State.RX_ON_TX_ON;
-            logger.info("Received TCP connection from " + tcpServerSocket.getInetAddress() + ". New state: " + state);
+            logger.info("Received TCP connection from " + tcpInSocket.getInetAddress() + ". New state: " + state);
             return true;
         } catch (SocketTimeoutException ignore) {
             logger.info("No new connection detected");
@@ -197,7 +199,7 @@ class Application {
         }
     }
 
-    private void initializeLogger(){
+    private void initializeLogger() {
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
     }
