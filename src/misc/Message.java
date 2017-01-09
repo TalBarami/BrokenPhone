@@ -29,16 +29,10 @@ public class Message {
     public static String getType(byte[] msg) {
         String message = new String(msg);
         if (message.contains(getName())) {
-
-            // ARAB - FIXME
-            if(getPort(msg) != 0)
+            if(message.length() >= 26 && getPort(msg) != 0)
                 return "OFFM";
             else
                 return "REQM";
-            /*if (message.length() == 20)
-                return "REQM";
-            else if (message.length() == 26)
-                return "OFFM";*/
         }
         return "UNDF";
     }
@@ -63,5 +57,20 @@ public class Message {
         StringBuilder result = new StringBuilder(msg);
         result.setCharAt(index, (char) (msg.charAt(index) + 'a'));
         return result.toString();
+    }
+
+    public static String getMessage(byte[] msg){
+        StringBuilder sb = new StringBuilder();
+        sb.append(getName());
+        sb.append(getType(msg));
+        sb.append(getId(msg));
+        if(getType(msg).equals("OFFM")) {
+            try {
+                sb.append(getIP(msg).toString()).append(getPort(msg));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
     }
 }

@@ -84,7 +84,7 @@ class Application {
             sendData = createRequestMessage();
             receiveData = new byte[32];
             udpSocket.send(new DatagramPacket(sendData, sendData.length, broadcastIP, udpPort));
-            logger.info("Sending request message via udp broadcast. Message: " + getId(sendData) + ", Port: " + udpPort);
+            logger.info("Sending request message via udp broadcast. Message: " + getMessage(sendData) + ", Port: " + udpPort);
 
             while (state.equals(State.RX_OFF_TX_OFF)) {
                 if (acceptTcpConnection())
@@ -148,7 +148,7 @@ class Application {
                 if (getType(response).equals("REQM")) {
                     handleRequestMessage(receivePacket, response);
                 } else {
-                    logger.warning("Received undefined message: " + new String(response));
+                    logger.warning("Received undefined message: " + getMessage(response));
                 }
             } catch (SocketTimeoutException ignore) {
                 logger.info("No new messages detected via the udp socket.");
@@ -195,10 +195,10 @@ class Application {
     }
 
     private void handleRequestMessage(DatagramPacket receivePacket, byte[] response) throws Exception{
-        logger.info("Received new request message: " + new String(response) + ". RID: " + getId(response));
+        logger.info("Received new request message: " + getMessage(response));
         sendData = createOfferMessage(getId(response), InetAddress.getLocalHost(), (short) tcpServerSocket.getLocalPort());
         udpSocket.send(new DatagramPacket(sendData, sendData.length, receivePacket.getAddress(), udpPort));
-        logger.info("Sent offer message: " + new String(sendData));
+        logger.info("Sent offer message: " + getMessage(sendData));
     }
 
     private void handleOfferMessage(byte[] response) throws Exception{
@@ -216,7 +216,7 @@ class Application {
             throw new MessageToSelfException();
 
         byte[] response = receivePacket.getData();
-        logger.info("Received new message: " + new String(response) + ". RID: " + getId(response));
+        logger.info("Received new message: " + getMessage(response));
 
         return receivePacket;
     }
