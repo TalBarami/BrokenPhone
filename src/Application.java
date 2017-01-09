@@ -185,7 +185,7 @@ class Application {
 
     private boolean acceptTcpConnection() throws Exception {
         if(tcpInSocket != null)
-            return false;//
+            return false;
         try {
             logger.info("Attempt to accept new connection...");
             tcpInSocket = tcpServerSocket.accept();
