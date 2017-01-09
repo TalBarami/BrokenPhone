@@ -1,3 +1,4 @@
+import exceptions.MessageToSelfException;
 import misc.State;
 
 import java.io.BufferedReader;
@@ -92,25 +93,15 @@ class Application {
                     break;
 
                 try {
-                    logger.info("Attempt to receive message from the udp socket...");
-                    DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                    udpSocket.receive(receivePacket);
-                    if (receivePacket.getAddress().equals(InetAddress.getLocalHost()))
-                        continue;
-
+                    DatagramPacket receivePacket = getUdpMessage();
                     byte[] response = receivePacket.getData();
-                    //String response = new String(receivePacket.getData());
-                    logger.info("Received new message: " + new String(response) + ". RID: " + getId(response));
+
                     switch (getType(response)) {
                         case "REQM":
-                            sendData = createOfferMessage(getId(response), InetAddress.getLocalHost(), (short) tcpServerSocket.getLocalPort());
-                            logger.info("Request message received. Sending offer message: " + new String(sendData));
-                            udpSocket.send(new DatagramPacket(sendData, sendData.length, receivePacket.getAddress(), udpPort));
+                            handleRequestMessage(receivePacket, response);
                             break;
                         case "OFFM":
-                            logger.info("Offer message received. Connecting to " + getIP(response));
-                            tcpOutSocket = new Socket(getIP(response), getPort(response));
-                            state = State.RX_OFF_TX_ON;
+                            handleOfferMessage(response);
                             break;
                         default:
                             logger.warning("Invalid message type. Ignored.");
@@ -119,6 +110,8 @@ class Application {
                 } catch (SocketTimeoutException e) {
                     logger.info("Failed to receive datagram packet. Broadcasting again.");
                     udpSocket.send(new DatagramPacket(sendData, sendData.length, broadcastIP, udpPort));
+                } catch (MessageToSelfException e){
+                    logger.info(e.getMessage());
                 }
             }
         } catch (Exception e) {
@@ -150,24 +143,19 @@ class Application {
             if (acceptTcpConnection())
                 break;
 
-            logger.info("Attempt to receive message from the udp socket...");
             try {
-                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                udpSocket.receive(receivePacket);
-                if (receivePacket.getAddress().equals(InetAddress.getLocalHost()))
-                    continue;
-
+                DatagramPacket receivePacket = getUdpMessage();
                 byte[] response = receivePacket.getData();
+
                 if (getType(response).equals("REQM")) {
-                    logger.info("Received new request message: " + new String(response) + ". RID: " + getId(response));
-                    sendData = createOfferMessage(getId(response), InetAddress.getLocalHost(), (short) tcpServerSocket.getLocalPort());
-                    udpSocket.send(new DatagramPacket(sendData, sendData.length, receivePacket.getAddress(), udpPort));
-                    logger.info("Sent offer message: " + new String(sendData));
+                    handleRequestMessage(receivePacket, response);
                 } else {
                     logger.warning("Received undefined message: " + new String(response));
                 }
             } catch (SocketTimeoutException ignore) {
                 logger.info("No new messages detected via the udp socket.");
+            } catch (MessageToSelfException e){
+                logger.info(e.getMessage());
             }
         }
     }
@@ -206,6 +194,33 @@ class Application {
             logger.info("No new connection detected");
             return false;
         }
+    }
+
+    private void handleRequestMessage(DatagramPacket receivePacket, byte[] response) throws Exception{
+        logger.info("Received new request message: " + new String(response) + ". RID: " + getId(response));
+        sendData = createOfferMessage(getId(response), InetAddress.getLocalHost(), (short) tcpServerSocket.getLocalPort());
+        udpSocket.send(new DatagramPacket(sendData, sendData.length, receivePacket.getAddress(), udpPort));
+        logger.info("Sent offer message: " + new String(sendData));
+    }
+
+    private void handleOfferMessage(byte[] response) throws Exception{
+        logger.info("Offer message received. Connecting to " + getIP(response));
+        tcpOutSocket = new Socket(getIP(response), getPort(response));
+        state = State.RX_OFF_TX_ON;
+    }
+
+    private DatagramPacket getUdpMessage() throws Exception{
+        logger.info("Attempt to receive message from the udp socket...");
+        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        udpSocket.receive(receivePacket);
+
+        if (receivePacket.getAddress().equals(InetAddress.getLocalHost()))
+            throw new MessageToSelfException();
+
+        byte[] response = receivePacket.getData();
+        logger.info("Received new message: " + new String(response) + ". RID: " + getId(response));
+
+        return receivePacket;
     }
 
     private void initializeLogger() {
