@@ -60,9 +60,13 @@ class Application {
                         System.exit(1);
                 }
             }
+        } catch(SocketException e){
+            logger.warning("Connection closed. System exit...");
+            System.exit(0);
         } catch (Exception e) {
             logger.severe("Fatal error detected.");
             e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -129,14 +133,14 @@ class Application {
             try {
                 System.out.println("Please enter your initial inputs below:");
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-                while (true) {
+                while (state.equals(State.RX_OFF_TX_ON)) {
                     String input = br.readLine();
-                    logger.info("Sent input: " + input);
 
                     DataOutputStream out = new DataOutputStream(tcpOutSocket.getOutputStream());
                     out.writeBytes(input + '\n');
-                    logger.info("Message sent via the tcp out socket.");
+                    logger.info("Sent input: " + input);
                 }
+                ex.shutdown();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -150,6 +154,9 @@ class Application {
             try {
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 udpSocket.receive(receivePacket);
+                if (receivePacket.getAddress().equals(InetAddress.getLocalHost()))
+                    continue;
+
                 byte[] response = receivePacket.getData();
                 if (getType(response).equals("REQM")) {
                     logger.info("Received new request message: " + new String(response) + ". RID: " + getId(response));
@@ -204,6 +211,5 @@ class Application {
     private void initializeLogger() {
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
-
     }
 }
