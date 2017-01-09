@@ -61,12 +61,10 @@ public class Message {
 
     public static String getMessage(byte[] msg){
         StringBuilder sb = new StringBuilder();
-        sb.append(getName());
-        sb.append(getType(msg));
-        sb.append(getId(msg));
+        sb.append(getName()).append(getType(msg)).append(getId(msg));
         if(getType(msg).equals("OFFM")) {
             try {
-                sb.append(getIP(msg).toString()).append(getPort(msg));
+                sb.append(getIP(msg).toString()).append(":").append(getPort(msg));
             } catch (Exception e) {
                 e.printStackTrace();
             }
