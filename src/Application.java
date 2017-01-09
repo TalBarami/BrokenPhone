@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.net.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import static misc.Message.*;
@@ -125,15 +127,16 @@ class Application {
 
         ex.submit(() -> {
             try {
-                System.out.println("Please enter your initial input below:");
+                System.out.println("Please enter your initial inputs below:");
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-                String input = br.readLine();
-                logger.info("Sent input: " + input);
+                while (true) {
+                    String input = br.readLine();
+                    logger.info("Sent input: " + input);
 
-                DataOutputStream out = new DataOutputStream(tcpOutSocket.getOutputStream());
-                out.writeBytes(input + '\n');
-                logger.info("Message sent via the tcp out socket.");
-                ex.shutdown();
+                    DataOutputStream out = new DataOutputStream(tcpOutSocket.getOutputStream());
+                    out.writeBytes(input + '\n');
+                    logger.info("Message sent via the tcp out socket.");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -201,5 +204,6 @@ class Application {
     private void initializeLogger() {
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
+
     }
 }
