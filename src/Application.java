@@ -75,16 +75,12 @@ class Application {
             tcpServerSocket.setSoTimeout(SECOND);
             logger.info("TCP server socket is up on port " + tcpServerSocket.getLocalPort());
 
-            InetAddress broadcastIP = InetAddress.getByName("255.255.255.255");
-
             udpSocket = new DatagramSocket(udpPort);
             udpSocket.setSoTimeout(SECOND);
             udpSocket.setBroadcast(true);
 
-            sendData = createRequestMessage();
             receiveData = new byte[32];
-            udpSocket.send(new DatagramPacket(sendData, sendData.length, broadcastIP, udpPort));
-            logger.info("Sending request message via udp broadcast. Message: " + getMessage(sendData) + ", Port: " + udpPort);
+            broadcastRequestMessage();
 
             while (state.equals(State.RX_OFF_TX_OFF)) {
                 if (acceptTcpConnection())
@@ -107,8 +103,7 @@ class Application {
                     }
                 } catch (SocketTimeoutException e) {
                     logger.info("Failed to receive datagram packet. Broadcasting new request message.");
-                    sendData = createRequestMessage();
-                    udpSocket.send(new DatagramPacket(sendData, sendData.length, broadcastIP, udpPort));
+                    broadcastRequestMessage();
                 } catch (MessageToSelfException e){
                     logger.info(e.getMessage());
                 }
@@ -193,6 +188,13 @@ class Application {
             logger.info("No new connection detected");
             return false;
         }
+    }
+
+    private void broadcastRequestMessage() throws Exception{
+        InetAddress broadcastIP = InetAddress.getByName("255.255.255.255");
+        sendData = createRequestMessage();
+        udpSocket.send(new DatagramPacket(sendData, sendData.length, broadcastIP, udpPort));
+        logger.info("Sending request message via udp broadcast. Message: " + getMessage(sendData) + ", Port: " + udpPort);
     }
 
     private void handleRequestMessage(DatagramPacket receivePacket, byte[] response) throws Exception{
