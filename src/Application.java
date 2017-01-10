@@ -153,11 +153,8 @@ class Application {
 
     private void brokenPhoneTail() throws Exception {
         while (state.equals(State.RX_ON_TX_OFF)) {
-            getTcpMessage();
-            /*logger.info("Waiting for input from " + tcpInSocket.getInetAddress());
-            BufferedReader br = new BufferedReader(new InputStreamReader(tcpInSocket.getInputStream()));
-            String input = br.readLine();
-            logger.info("Received input: " + input + " from " +tcpInSocket.getInetAddress());*/
+            String input = getTcpMessage();
+            System.out.println("Received new message: " + input);
         }
     }
 
@@ -165,15 +162,6 @@ class Application {
         while (state.equals(State.RX_ON_TX_ON)) {
             String input = getTcpMessage();
             sendTcpMessage(twistMessage(input));
-            /*logger.info("Waiting for input from " + tcpInSocket.getInetAddress());
-            BufferedReader br = new BufferedReader(new InputStreamReader(tcpInSocket.getInputStream()));
-            String input = br.readLine();
-            logger.info("Received input: " + input + " from " +tcpInSocket.getInetAddress());
-            String output = twistMessage(input);
-
-            DataOutputStream outputStream = new DataOutputStream(tcpOutSocket.getOutputStream());
-            outputStream.writeBytes(output);
-            logger.info("Sent message: " + output + " to " + tcpOutSocket.getInetAddress());*/
         }
     }
 
