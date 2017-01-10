@@ -153,16 +153,19 @@ class Application {
 
     private void brokenPhoneTail() throws Exception {
         while (state.equals(State.RX_ON_TX_OFF)) {
-            logger.info("Waiting for input from " + tcpInSocket.getInetAddress());
+            getTcpMessage();
+            /*logger.info("Waiting for input from " + tcpInSocket.getInetAddress());
             BufferedReader br = new BufferedReader(new InputStreamReader(tcpInSocket.getInputStream()));
             String input = br.readLine();
-            logger.info("Received input: " + input + " from " +tcpInSocket.getInetAddress());
+            logger.info("Received input: " + input + " from " +tcpInSocket.getInetAddress());*/
         }
     }
 
     private void brokenPhoneLink() throws Exception {
         while (state.equals(State.RX_ON_TX_ON)) {
-            logger.info("Waiting for input from " + tcpInSocket.getInetAddress());
+            String input = getTcpMessage();
+            sendTcpMessage(twistMessage(input));
+            /*logger.info("Waiting for input from " + tcpInSocket.getInetAddress());
             BufferedReader br = new BufferedReader(new InputStreamReader(tcpInSocket.getInputStream()));
             String input = br.readLine();
             logger.info("Received input: " + input + " from " +tcpInSocket.getInetAddress());
@@ -170,7 +173,7 @@ class Application {
 
             DataOutputStream outputStream = new DataOutputStream(tcpOutSocket.getOutputStream());
             outputStream.writeBytes(output);
-            logger.info("Sent message: " + output + " to " + tcpOutSocket.getInetAddress());
+            logger.info("Sent message: " + output + " to " + tcpOutSocket.getInetAddress());*/
         }
     }
 
@@ -227,9 +230,22 @@ class Application {
         return receivePacket;
     }
 
+    private String getTcpMessage() throws Exception{
+        logger.info("Waiting for input from " + tcpInSocket.getInetAddress());
+        BufferedReader br = new BufferedReader(new InputStreamReader(tcpInSocket.getInputStream()));
+        String input = br.readLine();
+        logger.info("Received input: " + input + " from " +tcpInSocket.getInetAddress());
+        return input;
+    }
+
+    private void sendTcpMessage(String msg) throws Exception{
+        DataOutputStream outputStream = new DataOutputStream(tcpOutSocket.getOutputStream());
+        outputStream.writeBytes(msg);
+        logger.info("Sent message: " + msg + " to " + tcpOutSocket.getInetAddress());
+    }
+
     private void initializeLogger() {
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
     }
-
 }
