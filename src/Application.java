@@ -135,7 +135,7 @@ class Application {
 
         while (state.equals(State.RX_OFF_TX_ON)) {
             if (acceptTcpConnection())
-                break;
+                return;
 
             try {
                 DatagramPacket receivePacket = getUdpMessage();
@@ -208,10 +208,7 @@ class Application {
         InetAddress toConnect = getIP(response);
         logger.info("Offer message received. Attempting to connect to " + toConnect);
         tcpOutSocket = new Socket(toConnect, getPort(response));
-        if(tcpOutSocket.isConnected())
-            state = State.RX_OFF_TX_ON;
-        else
-            logger.warning("Unable to connect to " + toConnect);
+        state = State.RX_OFF_TX_ON;
     }
 
     private DatagramPacket getUdpMessage() throws Exception{
