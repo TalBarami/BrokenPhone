@@ -106,7 +106,8 @@ class Application {
                             break;
                     }
                 } catch (SocketTimeoutException e) {
-                    logger.info("Failed to receive datagram packet. Broadcasting again.");
+                    logger.info("Failed to receive datagram packet. Broadcasting new request message.");
+                    sendData = createRequestMessage();
                     udpSocket.send(new DatagramPacket(sendData, sendData.length, broadcastIP, udpPort));
                 } catch (MessageToSelfException e){
                     logger.info(e.getMessage());
@@ -203,7 +204,7 @@ class Application {
 
     private void handleOfferMessage(byte[] response) throws Exception{
         InetAddress toConnect = getIP(response);
-        logger.info("Offer message received. Connecting to " + toConnect);
+        logger.info("Offer message received. Attempting to connect to " + toConnect);
         tcpOutSocket = new Socket(toConnect, getPort(response));
         if(tcpOutSocket.isConnected())
             state = State.RX_OFF_TX_ON;
