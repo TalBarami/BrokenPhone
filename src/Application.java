@@ -20,8 +20,6 @@ class Application {
 
     private DatagramSocket udpSocket;
     private int udpPort = 6000;
-    private byte[] sendData;
-    private byte[] receiveData;
 
     private ServerSocket tcpServerSocket;
     private Socket tcpInSocket;
@@ -79,7 +77,6 @@ class Application {
             udpSocket.setSoTimeout(SECOND);
             udpSocket.setBroadcast(true);
 
-            receiveData = new byte[32];
             broadcastRequestMessage();
 
             while (state.equals(State.RX_OFF_TX_OFF)) {
@@ -191,6 +188,7 @@ class Application {
     }
 
     private void broadcastRequestMessage() throws Exception{
+        byte[] sendData;
         InetAddress broadcastIP = InetAddress.getByName("255.255.255.255");
         sendData = createRequestMessage();
         udpSocket.send(new DatagramPacket(sendData, sendData.length, broadcastIP, udpPort));
@@ -198,6 +196,7 @@ class Application {
     }
 
     private void handleRequestMessage(DatagramPacket receivePacket, byte[] response) throws Exception{
+        byte[] sendData;
         logger.info("Received new request message: " + getMessage(response));
         sendData = createOfferMessage(getId(response), InetAddress.getLocalHost(), (short) tcpServerSocket.getLocalPort());
         udpSocket.send(new DatagramPacket(sendData, sendData.length, receivePacket.getAddress(), udpPort));
@@ -212,6 +211,7 @@ class Application {
     }
 
     private DatagramPacket getUdpMessage() throws Exception{
+        byte[] receiveData = new byte[32];
         logger.info("Attempt to receive message from the udp socket...");
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         udpSocket.receive(receivePacket);
