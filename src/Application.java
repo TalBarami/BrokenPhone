@@ -122,7 +122,7 @@ class Application {
 
                     DataOutputStream out = new DataOutputStream(tcpOutSocket.getOutputStream());
                     out.writeBytes(input + '\n');
-                    logger.info("Sent input: " + input);
+                    logger.info("Sent message: " + input + " to " + tcpOutSocket.getInetAddress());
                 }
                 ex.shutdown();
             } catch (Exception e) {
@@ -153,14 +153,16 @@ class Application {
 
     private void brokenPhoneTail() throws Exception {
         while (state.equals(State.RX_ON_TX_OFF)) {
+            logger.info("Waiting for input from " + tcpInSocket.getInetAddress());
             BufferedReader br = new BufferedReader(new InputStreamReader(tcpInSocket.getInputStream()));
             String input = br.readLine();
-            System.out.println("Received input: " + input);
+            logger.info("Received input: " + input + " from " +tcpInSocket.getInetAddress());
         }
     }
 
     private void brokenPhoneLink() throws Exception {
         while (state.equals(State.RX_ON_TX_ON)) {
+            logger.info("Waiting for input from " + tcpInSocket.getInetAddress());
             BufferedReader br = new BufferedReader(new InputStreamReader(tcpInSocket.getInputStream()));
             String input = br.readLine();
             logger.info("Received input: " + input + " from " +tcpInSocket.getInetAddress());
