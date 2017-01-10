@@ -84,7 +84,7 @@ class Application {
 
             while (state.equals(State.RX_OFF_TX_OFF)) {
                 if (acceptTcpConnection())
-                    break;
+                    return;
 
                 try {
                     DatagramPacket receivePacket = getUdpMessage();
