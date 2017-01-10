@@ -202,9 +202,13 @@ class Application {
     }
 
     private void handleOfferMessage(byte[] response) throws Exception{
-        logger.info("Offer message received. Connecting to " + getIP(response));
-        tcpOutSocket = new Socket(getIP(response), getPort(response));
-        state = State.RX_OFF_TX_ON;
+        InetAddress toConnect = getIP(response);
+        logger.info("Offer message received. Connecting to " + toConnect);
+        tcpOutSocket = new Socket(toConnect, getPort(response));
+        if(tcpOutSocket.isConnected())
+            state = State.RX_OFF_TX_ON;
+        else
+            logger.warning("Unable to connect to " + toConnect);
     }
 
     private DatagramPacket getUdpMessage() throws Exception{
