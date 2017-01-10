@@ -56,7 +56,7 @@ public class Message {
         int index = (int) (msg.length() * Math.random());
         int diff = (int) ((Math.random() > 0.5 ? 1 : -1) * (20 * Math.random()));
         StringBuilder result = new StringBuilder(msg);
-        result.setCharAt(index, (char) (msg.charAt(index) + 'a'));
+        result.setCharAt(index, (char) (msg.charAt(index) + diff));
         return result.toString();
     }
 
