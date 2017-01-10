@@ -240,7 +240,7 @@ class Application {
 
     private void sendTcpMessage(String msg) throws Exception{
         DataOutputStream outputStream = new DataOutputStream(tcpOutSocket.getOutputStream());
-        outputStream.writeBytes(msg);
+        outputStream.writeBytes(msg + "\n");
         logger.info("Sent message: " + msg + " to " + tcpOutSocket.getInetAddress());
     }
 
