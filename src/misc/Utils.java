@@ -11,7 +11,7 @@ public class Utils {
     public static final int MIN_PORT = 6000;
     public static final int MAX_PORT = 7000;
 
-    public static final int SECOND = 5000;
+    public static final int SECOND = 1000;
 
     public static int getAvailablePort() throws Exception {
 
