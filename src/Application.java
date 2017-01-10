@@ -163,12 +163,12 @@ class Application {
         while (state.equals(State.RX_ON_TX_ON)) {
             BufferedReader br = new BufferedReader(new InputStreamReader(tcpInSocket.getInputStream()));
             String input = br.readLine();
-            logger.info("Received input: " + input);
+            logger.info("Received input: " + input + " from " +tcpInSocket.getInetAddress());
             String output = twistMessage(input);
 
             DataOutputStream outputStream = new DataOutputStream(tcpOutSocket.getOutputStream());
             outputStream.writeBytes(output);
-            logger.info("Sent message: " + output);
+            logger.info("Sent message: " + output + " to " + tcpOutSocket.getInetAddress());
         }
     }
 
