@@ -203,6 +203,7 @@ class Application {
             return false;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
 
         if(tcpOutSocket != null && tcpInSocket.getInetAddress().equals(tcpOutSocket.getInetAddress())){
@@ -257,10 +258,8 @@ class Application {
             return;
         }
 
-        tcpOutSocket = new Socket();
-        //tcpOutSocket.bind(new InetSocketAddress(toConnect,getPort(response)));
         try {
-            tcpOutSocket.connect(new InetSocketAddress(toConnect, getPort(response)), 10);
+            tcpOutSocket = new Socket(toConnect, getPort(response));
         } catch(IOException e){
             logger.warning("Failed to connect to " + toConnect + " because other side refused connection.");
             tcpOutSocket.close();
