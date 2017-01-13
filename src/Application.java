@@ -199,6 +199,7 @@ class Application {
         try {
             logger.info("Attempt to accept new connection...");
             tcpInSocket = tcpServerSocket.accept();
+            tcpServerSocket.close();
             logger.info("Received TCP connection from " + tcpInSocket.getInetAddress());
         } catch (SocketTimeoutException ignore) {
             logger.info("No new connection detected");
@@ -261,10 +262,9 @@ class Application {
         }
 
         try {
-            tcpOutSocket = new Socket();
-            tcpOutSocket.setSoTimeout(SECOND);
-            tcpOutSocket.connect(new InetSocketAddress(toConnect, getPort(response)), SECOND);
+            tcpOutSocket = new Socket(toConnect, getPort(response));
             System.out.println(tcpOutSocket.isConnected());
+            System.out.println(tcpOutSocket.isBound());
             System.out.println(tcpOutSocket.getInetAddress());
         } catch(IOException e){
             logger.warning("Failed to connect to " + toConnect + " because other side refused connection.");
