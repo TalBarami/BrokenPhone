@@ -172,17 +172,20 @@ class Application {
         try {
             logger.info("Attempt to accept new connection...");
             tcpInSocket = tcpServerSocket.accept();
-            if(tcpInSocket.isConnected() && tcpInSocket.getInetAddress().equals(tcpOutSocket.getInetAddress())){
-                logger.warning("Received new connection from the out-socket address. Ignored.");
-                tcpInSocket.close();
-                tcpInSocket = null;
-            }
-            state = state.equals(State.RX_OFF_TX_OFF) ? State.RX_ON_TX_OFF : State.RX_ON_TX_ON;
-            logger.info("Received TCP connection from " + tcpInSocket.getInetAddress() + ". New state: " + state);
-            return true;
         } catch (SocketTimeoutException ignore) {
             logger.info("No new connection detected");
             return false;
+        }
+
+        if(tcpInSocket.isConnected() && tcpInSocket.getInetAddress().equals(tcpOutSocket.getInetAddress())){
+            logger.warning("Received new connection from the out-socket address. Ignored.");
+            tcpInSocket.close();
+            tcpInSocket = null;
+            return false;
+        } else {
+            state = state.equals(State.RX_OFF_TX_OFF) ? State.RX_ON_TX_OFF : State.RX_ON_TX_ON;
+            logger.info("Received TCP connection from " + tcpInSocket.getInetAddress() + ". New state: " + state);
+            return true;
         }
     }
 
