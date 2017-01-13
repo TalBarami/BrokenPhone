@@ -192,8 +192,10 @@ class Application {
      * @return whether succeed to accept a new tcp connection.
      */
     private boolean acceptTcpConnection() throws IOException {
-        if(tcpInSocket != null)
+        if(tcpInSocket != null) {
+            logger.info("In-socket is already connected to " + tcpInSocket.getInetAddress() + ". Ignored.");
             return false;
+        }
         try {
             logger.info("Attempt to accept new connection...");
             tcpInSocket = tcpServerSocket.accept();
