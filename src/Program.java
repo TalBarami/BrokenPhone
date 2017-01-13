@@ -5,6 +5,7 @@ public class Program {
 
         Application app = new Application();
 
-        app.start();
+        while(true)
+            app.start();
     }
 }

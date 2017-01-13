@@ -48,7 +48,7 @@ class Application {
                     case RX_ON_TX_OFF:
                         logger.info("We are at the tail of the broken phone simulation.");
                         brokenPhoneTail();
-                        break;
+                        exit(0);
                     case RX_ON_TX_ON:
                         logger.info("We are at the body of the broken phone simulation.");
                         brokenPhoneLink();
