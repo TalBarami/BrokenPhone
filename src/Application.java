@@ -199,7 +199,6 @@ class Application {
         try {
             logger.info("Attempt to accept new connection...");
             tcpInSocket = tcpServerSocket.accept();
-            tcpServerSocket.close();
             logger.info("Received TCP connection from " + tcpInSocket.getInetAddress());
         } catch (SocketTimeoutException ignore) {
             logger.info("No new connection detected");
@@ -216,6 +215,7 @@ class Application {
             return false;
         } else {
             state = state.equals(State.RX_OFF_TX_OFF) ? State.RX_ON_TX_OFF : State.RX_ON_TX_ON;
+            tcpServerSocket.close();
             logger.info("New state: " + state);
             return true;
         }
