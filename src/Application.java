@@ -53,11 +53,11 @@ class Application {
                     case RX_ON_TX_OFF:
                         logger.info("We are at the tail of the broken phone simulation.");
                         brokenPhoneTail();
-                        break;
+                        return;
                     case RX_ON_TX_ON:
                         logger.info("We are at the body of the broken phone simulation.");
                         brokenPhoneLink();
-                        break;
+                        return;
                     default:
                         logger.severe("Fatal error detected. Invalid state.");
                         exit(1);
@@ -170,7 +170,7 @@ class Application {
      * In this state we are waiting to receive inputs from another link and display it on the screen.
      */
     private void brokenPhoneTail() throws Exception {
-        while (state.equals(State.RX_ON_TX_OFF)) {
+        while (state.equals(State.RX_ON_TX_OFF) && tcpInSocket.isConnected() && tcpOutSocket.isConnected()) {
             String input = getTcpMessage();
             System.out.println("Received new message: " + input);
         }
@@ -181,7 +181,7 @@ class Application {
      * In this state we accept new messages from the previous link and transfer them to the next one.
      */
     private void brokenPhoneLink() throws Exception {
-        while (state.equals(State.RX_ON_TX_ON)) {
+        while (state.equals(State.RX_ON_TX_ON) && tcpInSocket.isConnected() && tcpOutSocket.isConnected()) {
             String input = getTcpMessage();
             sendTcpMessage(twistMessage(input));
         }
