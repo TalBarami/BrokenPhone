@@ -119,11 +119,15 @@ class Application {
                 System.out.println("Please enter your initial inputs below:");
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
                 while (state.equals(State.RX_OFF_TX_ON)) {
-                    String input = br.readLine();
+                    //String input = br.readLine();
+
+                    Thread.sleep(4 * SECOND);
+                    String input = "Hello world!";
 
                     DataOutputStream out = new DataOutputStream(tcpOutSocket.getOutputStream());
                     out.writeBytes(input + '\n');
                     logger.info("Sent message: " + input + " to " + tcpOutSocket.getInetAddress());
+
                 }
                 ex.shutdown();
             } catch (Exception e) {
@@ -153,10 +157,10 @@ class Application {
     }
 
     private void brokenPhoneTail() throws Exception {
-        while (state.equals(State.RX_ON_TX_OFF)) {
+        //while (state.equals(State.RX_ON_TX_OFF)) {
             String input = getTcpMessage();
             System.out.println("Received new message: " + input);
-        }
+        //}
     }
 
     private void brokenPhoneLink() throws Exception {
