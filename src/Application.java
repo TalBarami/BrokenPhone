@@ -3,6 +3,7 @@ import misc.State;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.util.concurrent.ExecutorService;
@@ -54,16 +55,16 @@ class Application {
                         break;
                     default:
                         logger.severe("Fatal error detected. Invalid state.");
-                        System.exit(1);
+                        exit(1);
                 }
             }
         } catch(SocketException e){
             logger.warning("Connection closed. System exit...");
-            System.exit(0);
+            exit(0);
         } catch (Exception e) {
             logger.severe("Fatal error detected.");
             e.printStackTrace();
-            System.exit(1);
+            exit(1);
         }
     }
 
@@ -171,6 +172,11 @@ class Application {
         try {
             logger.info("Attempt to accept new connection...");
             tcpInSocket = tcpServerSocket.accept();
+            if(tcpInSocket.isConnected() && tcpInSocket.getInetAddress().equals(tcpOutSocket.getInetAddress())){
+                logger.warning("Received new connection from the out-socket address. Ignored.");
+                tcpInSocket.close();
+                tcpInSocket = null;
+            }
             state = state.equals(State.RX_OFF_TX_OFF) ? State.RX_ON_TX_OFF : State.RX_ON_TX_ON;
             logger.info("Received TCP connection from " + tcpInSocket.getInetAddress() + ". New state: " + state);
             return true;
@@ -235,5 +241,26 @@ class Application {
     private void initializeLogger() {
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
+    }
+
+    private void exit(int exitCode){
+        try {
+            if (tcpInSocket != null)
+                tcpInSocket.close();
+            if (tcpOutSocket != null)
+                tcpOutSocket.close();
+            if (tcpServerSocket != null)
+                tcpServerSocket.close();
+            if (udpSocket != null)
+                udpSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        tcpInSocket = null;
+        tcpOutSocket = null;
+        tcpServerSocket = null;
+        udpSocket = null;
+
+        System.exit(exitCode);
     }
 }
