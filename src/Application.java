@@ -249,11 +249,12 @@ class Application {
     private void handleOfferMessage(byte[] response) throws Exception{
         InetAddress toConnect = getIP(response);
         logger.info("Offer message received. Attempting to connect to " + toConnect);
-        tcpOutSocket = new Socket(toConnect, getPort(response));
-        if(!tcpOutSocket.isConnected()){
+        tcpOutSocket = new Socket();
+        //tcpOutSocket.bind(new InetSocketAddress(toConnect,getPort(response)));
+        try {
+            tcpOutSocket.connect(new InetSocketAddress(toConnect, getPort(response)), 10);
+        } catch(Exception e){
             logger.warning("Failed to connect to " + toConnect);
-            tcpOutSocket.close();
-            tcpOutSocket = null;
             return;
         }
         state = State.RX_OFF_TX_ON;
