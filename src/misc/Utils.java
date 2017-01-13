@@ -13,6 +13,11 @@ public class Utils {
 
     public static final int SECOND = 1000;
 
+    /**
+     * Will attempt to receive an available port for the server socket between {@link Utils#MIN_PORT} and {@link Utils#MAX_PORT}
+     * @return available port.
+     * @throws Exception if no port is available
+     */
     public static int getAvailablePort() throws Exception {
 
         for (int i = MIN_PORT; i < MAX_PORT; i++) {

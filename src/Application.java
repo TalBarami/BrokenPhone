@@ -26,12 +26,17 @@ class Application {
     private Socket tcpInSocket;
     private Socket tcpOutSocket;
 
-
+    /**
+     * Application is created with state {@link State#RX_OFF_TX_OFF}
+     */
     Application() {
         initializeLogger();
         state = State.RX_OFF_TX_OFF;
     }
 
+    /**
+     * Start the broken phone simulation.
+     */
     void start() {
         try {
             while (true) {
@@ -68,6 +73,10 @@ class Application {
         }
     }
 
+    /**
+     * Initialize the broken phone app, while state is {@link State#RX_OFF_TX_OFF}.
+     * @throws Exception
+     */
     private void initialize() throws Exception {
         try {
             tcpServerSocket = new ServerSocket(getAvailablePort());
@@ -111,6 +120,9 @@ class Application {
         }
     }
 
+    /**
+     * Represents the head of the broken phone app, while state is {@link State#RX_OFF_TX_ON}.
+     */
     private void brokenPhoneHead() throws Exception {
         ExecutorService ex = Executors.newFixedThreadPool(1);
 
@@ -153,6 +165,10 @@ class Application {
         }
     }
 
+    /**
+     * Represents the tail of the broken phone app, while state is {@link State#RX_ON_TX_OFF}.
+     * In this state we are waiting to receive inputs from another link and display it on the screen.
+     */
     private void brokenPhoneTail() throws Exception {
         while (state.equals(State.RX_ON_TX_OFF)) {
             String input = getTcpMessage();
@@ -160,6 +176,10 @@ class Application {
         }
     }
 
+    /**
+     * Represents a link of the broken phone app, while state is {@link State#RX_ON_TX_ON}.
+     * In this state we accept new messages from the previous link and transfer them to the next one.
+     */
     private void brokenPhoneLink() throws Exception {
         while (state.equals(State.RX_ON_TX_ON)) {
             String input = getTcpMessage();
@@ -167,6 +187,10 @@ class Application {
         }
     }
 
+    /**
+     * The server will attempt to receive a new tcp-input-connection.
+     * @return whether succeed to accept a new tcp connection.
+     */
     private boolean acceptTcpConnection() throws Exception {
         if(tcpInSocket != null)
             return false;
@@ -191,6 +215,9 @@ class Application {
         }
     }
 
+    /**
+     * The udp socket will broadcast a new request message.
+     */
     private void broadcastRequestMessage() throws Exception{
         byte[] sendData;
         InetAddress broadcastIP = InetAddress.getByName("255.255.255.255");
@@ -199,6 +226,12 @@ class Application {
         logger.info("Sending request message via udp broadcast. Message: " + getMessage(sendData) + ", Port: " + udpPort);
     }
 
+    /**
+     * Handle the newly accepted request message.
+     * Sending offer message as response.
+     * @param receivePacket
+     * @param response
+     */
     private void handleRequestMessage(DatagramPacket receivePacket, byte[] response) throws Exception{
         byte[] sendData;
         logger.info("Received new request message: " + getMessage(response));
@@ -207,6 +240,12 @@ class Application {
         logger.info("Sent offer message: " + getMessage(sendData));
     }
 
+    /**
+     * Handle the newly received offer message.
+     * Attempting to connect the tcp out socket into the offered address.
+     * @param response
+     * @throws Exception
+     */
     private void handleOfferMessage(byte[] response) throws Exception{
         InetAddress toConnect = getIP(response);
         logger.info("Offer message received. Attempting to connect to " + toConnect);
@@ -214,6 +253,11 @@ class Application {
         state = State.RX_OFF_TX_ON;
     }
 
+    /**
+     * Attempts to received a udp message (request or offer message).
+     * @return the newly received message.
+     * @throws Exception
+     */
     private DatagramPacket getUdpMessage() throws Exception{
         byte[] receiveData = new byte[32];
         logger.info("Attempt to receive message from the udp socket...");
@@ -229,6 +273,11 @@ class Application {
         return receivePacket;
     }
 
+    /**
+     * Attempts to receive a new tcp message (raw input).
+     * @return the newly received message.
+     * @throws Exception
+     */
     private String getTcpMessage() throws Exception{
         logger.info("Waiting for input from " + tcpInSocket.getInetAddress());
         BufferedReader br = new BufferedReader(new InputStreamReader(tcpInSocket.getInputStream()));
@@ -237,17 +286,29 @@ class Application {
         return input;
     }
 
+    /**
+     * Sending new tcp message via the tcp out socket.
+     * @param msg the message to be sent.
+     * @throws Exception
+     */
     private void sendTcpMessage(String msg) throws Exception{
         DataOutputStream outputStream = new DataOutputStream(tcpOutSocket.getOutputStream());
         outputStream.writeBytes(msg + "\n");
         logger.info("Sent message: " + msg + " to " + tcpOutSocket.getInetAddress());
     }
 
+    /**
+     * Initialize the logging format.
+     */
     private void initializeLogger() {
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
     }
 
+    /**
+     * Close all sockets before exit.
+     * @param exitCode
+     */
     private void exit(int exitCode){
         try {
             if (tcpInSocket != null)
