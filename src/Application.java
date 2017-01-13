@@ -260,7 +260,6 @@ class Application {
         tcpOutSocket = null;
         tcpServerSocket = null;
         udpSocket = null;
-
         System.exit(exitCode);
     }
 }
