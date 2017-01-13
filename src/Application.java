@@ -250,6 +250,10 @@ class Application {
         InetAddress toConnect = getIP(response);
         logger.info("Offer message received. Attempting to connect to " + toConnect);
         tcpOutSocket = new Socket(toConnect, getPort(response));
+        if(!tcpOutSocket.isConnected()){
+            logger.warning("Failed to connect to " + toConnect);
+            return;
+        }
         state = State.RX_OFF_TX_ON;
     }
 
