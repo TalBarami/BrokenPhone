@@ -261,7 +261,9 @@ class Application {
         }
 
         try {
-            tcpOutSocket = new Socket(toConnect, getPort(response));
+            tcpOutSocket = new Socket();
+            tcpOutSocket.setSoTimeout(SECOND);
+            tcpOutSocket.connect(new InetSocketAddress(toConnect, getPort(response)), SECOND);
             System.out.println(tcpOutSocket.isConnected());
             System.out.println(tcpOutSocket.getInetAddress());
         } catch(IOException e){
