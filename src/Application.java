@@ -252,6 +252,8 @@ class Application {
         tcpOutSocket = new Socket(toConnect, getPort(response));
         if(!tcpOutSocket.isConnected()){
             logger.warning("Failed to connect to " + toConnect);
+            tcpOutSocket.close();
+            tcpOutSocket = null;
             return;
         }
         state = State.RX_OFF_TX_ON;
