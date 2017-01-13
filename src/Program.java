@@ -5,13 +5,6 @@ public class Program {
 
         Application app = new Application();
 
-        while(true) {
-            System.out.println("Starting new round...");
-            System.out.println("Starting new round...");
-            System.out.println("Starting new round...");
-            System.out.println("Starting new round...");
-            System.out.println("Starting new round...");
-            app.start();
-        }
+        app.start();
     }
 }
