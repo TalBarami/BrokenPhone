@@ -1,6 +1,7 @@
 package misc;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
 public class Message {
@@ -67,7 +68,7 @@ public class Message {
      * @param msg the received message.
      * @return the inetAddress of the message.
      */
-    public static InetAddress getIP(byte[] msg) throws Exception {
+    public static InetAddress getIP(byte[] msg) throws UnknownHostException {
         byte[] ip = new byte[4];
         ByteBuffer.wrap(msg, 20, 4).get(ip);
 

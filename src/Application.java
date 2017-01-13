@@ -191,7 +191,7 @@ class Application {
      * The server will attempt to receive a new tcp-input-connection.
      * @return whether succeed to accept a new tcp connection.
      */
-    private boolean acceptTcpConnection() throws Exception {
+    private boolean acceptTcpConnection() throws IOException {
         if(tcpInSocket != null)
             return false;
         try {
@@ -201,6 +201,8 @@ class Application {
         } catch (SocketTimeoutException ignore) {
             logger.info("No new connection detected");
             return false;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         if(tcpOutSocket != null && tcpInSocket.getInetAddress().equals(tcpOutSocket.getInetAddress())){
@@ -246,7 +248,7 @@ class Application {
      * @param response
      * @throws Exception
      */
-    private void handleOfferMessage(byte[] response) throws Exception{
+    private void handleOfferMessage(byte[] response) throws IOException {
         InetAddress toConnect = getIP(response);
         logger.info("Offer message received. Attempting to connect to " + toConnect);
 
@@ -259,7 +261,7 @@ class Application {
         //tcpOutSocket.bind(new InetSocketAddress(toConnect,getPort(response)));
         try {
             tcpOutSocket.connect(new InetSocketAddress(toConnect, getPort(response)), 10);
-        } catch(Exception e){
+        } catch(IOException e){
             logger.warning("Failed to connect to " + toConnect + " because other side refused connection.");
             tcpOutSocket.close();
             tcpOutSocket = null;
