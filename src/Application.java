@@ -130,7 +130,7 @@ class Application {
             try {
                 System.out.println("Please enter your initial inputs below:");
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-                while (state.equals(State.RX_OFF_TX_ON)) {
+                while (state.equals(State.RX_OFF_TX_ON) && tcpOutSocket.isConnected()) {
                     String input = br.readLine();
 
                     DataOutputStream out = new DataOutputStream(tcpOutSocket.getOutputStream());
@@ -170,7 +170,7 @@ class Application {
      * In this state we are waiting to receive inputs from another link and display it on the screen.
      */
     private void brokenPhoneTail() throws Exception {
-        while (state.equals(State.RX_ON_TX_OFF) && tcpInSocket.isConnected() && tcpOutSocket.isConnected()) {
+        while (state.equals(State.RX_ON_TX_OFF) && tcpInSocket.isConnected()) {
             String input = getTcpMessage();
             System.out.println("Received new message: " + input);
         }
