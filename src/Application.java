@@ -177,7 +177,7 @@ class Application {
             return false;
         }
 
-        if(tcpInSocket.isConnected() && tcpInSocket.getInetAddress().equals(tcpOutSocket.getInetAddress())){
+        if(tcpInSocket.isConnected() && tcpOutSocket != null && tcpInSocket.getInetAddress().equals(tcpOutSocket.getInetAddress())){
             logger.warning("Received new connection from the out-socket address. Ignored.");
             tcpInSocket.close();
             tcpInSocket = null;
