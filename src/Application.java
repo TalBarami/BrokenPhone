@@ -262,6 +262,8 @@ class Application {
 
         try {
             tcpOutSocket = new Socket(toConnect, getPort(response));
+            System.out.println(tcpOutSocket.isConnected());
+            System.out.println(tcpOutSocket.getInetAddress());
         } catch(IOException e){
             logger.warning("Failed to connect to " + toConnect + " because other side refused connection.");
             tcpOutSocket.close();
