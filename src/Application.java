@@ -170,7 +170,7 @@ class Application {
      * In this state we are waiting to receive inputs from another link and display it on the screen.
      */
     private void brokenPhoneTail() throws Exception {
-        while (state.equals(State.RX_ON_TX_OFF) && tcpInSocket.isConnected()) {
+        while (state.equals(State.RX_ON_TX_OFF)) {
             String input = getTcpMessage();
             System.out.println("Received new message: " + input);
         }
@@ -181,7 +181,7 @@ class Application {
      * In this state we accept new messages from the previous link and transfer them to the next one.
      */
     private void brokenPhoneLink() throws Exception {
-        while (state.equals(State.RX_ON_TX_ON) && tcpInSocket.isConnected() && tcpOutSocket.isConnected()) {
+        while (state.equals(State.RX_ON_TX_ON)) {
             String input = getTcpMessage();
             sendTcpMessage(twistMessage(input));
         }
@@ -197,20 +197,20 @@ class Application {
         try {
             logger.info("Attempt to accept new connection...");
             tcpInSocket = tcpServerSocket.accept();
+            logger.info("Received TCP connection from " + tcpInSocket.getInetAddress());
         } catch (SocketTimeoutException ignore) {
             logger.info("No new connection detected");
             return false;
         }
 
-        if(tcpInSocket.isConnected() && tcpOutSocket != null && tcpInSocket.getInetAddress().equals(tcpOutSocket.getInetAddress())){
-            logger.warning("Received new connection from the out-socket address. Ignored.");
-            System.exit(5);
+        if(tcpOutSocket != null && tcpInSocket.getInetAddress().equals(tcpOutSocket.getInetAddress())){
+            logger.warning("The new in-connection is the same as the out-connection. Ignored.");
             tcpInSocket.close();
             tcpInSocket = null;
             return false;
         } else {
             state = state.equals(State.RX_OFF_TX_OFF) ? State.RX_ON_TX_OFF : State.RX_ON_TX_ON;
-            logger.info("Received TCP connection from " + tcpInSocket.getInetAddress() + ". New state: " + state);
+            logger.info("New state: " + state);
             return true;
         }
     }
