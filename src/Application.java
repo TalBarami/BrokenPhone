@@ -48,7 +48,7 @@ class Application {
                     case RX_ON_TX_OFF:
                         logger.info("We are at the tail of the broken phone simulation.");
                         brokenPhoneTail();
-                        exit(0);
+                        return;
                     case RX_ON_TX_ON:
                         logger.info("We are at the body of the broken phone simulation.");
                         brokenPhoneLink();
@@ -179,6 +179,7 @@ class Application {
 
         if(tcpInSocket.isConnected() && tcpOutSocket != null && tcpInSocket.getInetAddress().equals(tcpOutSocket.getInetAddress())){
             logger.warning("Received new connection from the out-socket address. Ignored.");
+            System.exit(5);
             tcpInSocket.close();
             tcpInSocket = null;
             return false;
